@@ -26,8 +26,16 @@ function createShip() {
 
   for (i = 0; i<shipSizes.length; i++) {
     let shipSize = shipSizes[i];
-    let line = generateRandom(lines);
-    let col = generateRandom(cols - shipSize);
+    let line, col;
+    isOverlap = true;
+
+    while (isOverlap) {
+      line = generateRandom(lines);
+      col = generateRandom(cols - shipSize);
+
+      isOverlap = checkOverlap(ships, line, col, shipSize);
+    }
+
     ship = [];
   
     for (j = 0; j < shipSize; j++) {
@@ -39,6 +47,22 @@ function createShip() {
 
   console.log(ships);
   return ships;
+}
+
+function checkOverlap(ships, line, col, shipSize) {
+  for (let i = 0; i < ships.length; i++) {
+    const ship = ships[i];
+
+    for (let j = 0; j < ship.length; j++) {
+      const [shipLine, shipCol] = ship[j];
+
+      if (line === shipLine && col <= shipCol && shipCol < col + shipSize) {
+        return true; // Sobreposição encontrada
+      }
+    }
+  }
+
+  return false; // Sem sobreposição
 }
 
 function cellClick() {
@@ -58,16 +82,16 @@ function cellClick() {
 function checkForHit(row,col) {
   for(let i=0; i<shipLocations.length; i++) {
     console.log(shipLocations[i]);
-    for(let j=0; j < shipLocations[i].length; j++) {
-    console.log(shipLocations[i][j]);
-    if (shipLocations[i][j][0] == row && shipLocations[i][j][1] == col ) {
-      hitTarget++;
-      shipLocations[i].splice(i,1);
+    for (let j=0; j < shipLocations[i].length; j++) {
+      console.log(shipLocations[i][j]);
+      if (shipLocations[i][j][0] == row && shipLocations[i][j][1] == col ) {
+        hitTarget++;
+        shipLocations[i].splice(j,1);
 
-      if(shipLocations[i].length) {
-        shipLocations.splice[i,1];
-      }
-      return true;
+        if(!shipLocations[i].length) {
+          shipLocations.splice(i,1);
+        }
+        return true;
       }
     }
   }
